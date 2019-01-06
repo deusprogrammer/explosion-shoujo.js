@@ -1,6 +1,10 @@
 export default {
-  gameWidth: 760,
-  gameHeight: 400,
+  gameWidth: 15 * 48,
+  gameHeight: 15 * 48,
+  BLOCK_SIZE: 48,
+  MOVEMENT_VELOCITY: 250,
+  ALLOWED_DISTANCE: 20,
+  BB_ADJUST: 0,
   localStorageName: 'phaseres6webpack',
   webfonts: ['Bangers']
 }
