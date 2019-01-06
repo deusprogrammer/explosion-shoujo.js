@@ -1,6 +1,6 @@
 {
-    "short_name": "MyPhaserGame",
-    "name": "PhaserES6Webpack",
+    "short_name": "Explosion Shoujo",
+    "name": "Explosion Shoujo",
     "start_url": "./index.html",
     "display": "standalone",
     "theme_color": "#ffffff",
