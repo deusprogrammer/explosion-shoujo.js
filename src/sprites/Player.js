@@ -15,6 +15,9 @@ export default class extends Phaser.Sprite {
     this.fuse = 180
     this.radius = 4
 
+    this.bombsPlaced = 0
+    this.maxBombs = 2
+
     this.controls = controls
     this.parentState = parentState
 
@@ -23,6 +26,7 @@ export default class extends Phaser.Sprite {
     this.animations.add('left', [3, 4, 5], 5, true)
     this.animations.add('right', [6, 7, 8], 5, true)
     this.animations.add('down', [0, 1, 2], 5, true)
+    this.animations.add('die', [9, 3, 6, 0], 5, true)
 
     // Enable physics on this character
     game.physics.arcade.enable(this)
@@ -79,9 +83,15 @@ export default class extends Phaser.Sprite {
         this.animations.stop();
     }
 
-    if (bombButton.isDown) {
+    if (this.controls.bombButtonPressed()) {
     	this.body.velocity.x = 0;
     	this.body.velocity.y = 0;
+
+      if (this.bombsPlaced >= this.maxBombs) {
+        return
+      }
+
+      this.bombsPlaced++
 
     	var bombBlock = this.getFacingBlock()
     	this.parentState.spawnBomb(this, bombBlock.x, bombBlock.y)
@@ -122,5 +132,9 @@ export default class extends Phaser.Sprite {
     delta.y = Math.abs(this.center.y - idealBlock.center.y);
 
     return delta;
+  }
+
+  kill() {
+    this.animations.play("die")
   }
 }

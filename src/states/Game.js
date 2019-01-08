@@ -19,6 +19,8 @@ export default class extends Phaser.State {
     // Start physics system
     this.physics.startSystem(Phaser.Physics.ARCADE)
 
+    this.playerCount = 1
+
     // Create controls
     this.controls = new Controls({
       game: this.game
@@ -44,6 +46,11 @@ export default class extends Phaser.State {
 
   update() {
     this.adjustForCollisions(this.player, this.currentLevel)
+
+    if (this.playerCount === 0) {
+      console.log("GAME OVER")
+      this.state.start("GameOver")
+    }
   }
 
   spawnBomb(owner, x, y) {
@@ -113,11 +120,8 @@ export default class extends Phaser.State {
 
         // Check if a player was killed
         if (point.x === this.player.block.x && point.y === this.player.block.y) {
-          if (owner === this.player) {
-            console.log("YOU KILLED YOURSELF")
-          } else {
-            console.log("YOU DIED")
-          }
+          this.playerCount--
+          this.player.kill()
         }
     }
   }
