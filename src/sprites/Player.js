@@ -5,10 +5,11 @@ import Bomb from './Bomb'
 import config from '../config.js'
 
 export default class extends Phaser.Sprite {
-  constructor ({ game, x, y, asset, controls, parentState }) {
+  constructor ({ game, x, y, asset, name, controls, parentState }) {
     super(game, x, y, asset)
 
     // Initializing variables
+    this.name = name
     this.center = {}
     this.block = {}
     this.direction = 'down'
@@ -41,18 +42,22 @@ export default class extends Phaser.Sprite {
   }
 
   update () {
-	this.center.x = this.x + config.BLOCK_SIZE/2;
-	this.center.y = this.y + config.BLOCK_SIZE/2;
+  	this.center.x = this.x + config.BLOCK_SIZE/2;
+  	this.center.y = this.y + config.BLOCK_SIZE/2;
 
-	this.block.x = Math.floor(this.center.x / config.BLOCK_SIZE);
-	this.block.y = Math.floor(this.center.y / config.BLOCK_SIZE);
+  	this.block.x = Math.floor(this.center.x / config.BLOCK_SIZE);
+  	this.block.y = Math.floor(this.center.y / config.BLOCK_SIZE);
 
-	//  Reset the players velocity (movement)
+  	//  Reset the players velocity (movement)
     this.body.velocity.x = 0;
     this.body.velocity.y = 0;
 
     let cursors = this.controls.cursors
     let bombButton = this.controls.bombButton
+
+    if (this.controls.locked) {
+      return
+    }
 
     if (cursors.left.isDown) {
         //  Move left

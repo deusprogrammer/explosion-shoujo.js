@@ -1,10 +1,16 @@
 import Phaser from 'phaser'
 
 export default class Controls {
-	constructor({game}) {
-		this.cursors = game.input.keyboard.createCursorKeys();
-    	this.bombButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
+	constructor({game, up, left, down, right, bomb}) {
+		this.cursors = {
+			up: game.input.keyboard.addKey(up),
+			down: game.input.keyboard.addKey(down),
+			left: game.input.keyboard.addKey(left),
+			right: game.input.keyboard.addKey(right)
+		}
+    	this.bombButton = game.input.keyboard.addKey(bomb);
 		this.buttonAlreadyPressed = false
+		this.locked = false
 	}
 
 	bombButtonPressed() {
@@ -15,5 +21,9 @@ export default class Controls {
 			this.buttonAlreadyPressed = false
 			return false
 		}
+	}
+
+	lock() {
+		this.locked = true
 	}
 }
