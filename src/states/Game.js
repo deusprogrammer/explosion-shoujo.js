@@ -112,7 +112,7 @@ export default class extends Phaser.State {
         parentState: this
       })
 
-      this.currentLevel.blocks.add(bomb)
+      this.currentLevel.bombs.add(bomb)
     }
   }
 
@@ -122,26 +122,36 @@ export default class extends Phaser.State {
     var explosionCoords = []
     var rt = "rt", up = "up", lf = "lf", dn = "dn"
     var maxRanges = {rt: 0, dn: 0, lf: 0, up: 0}
+
+    var rtStopped = false, lfStopped = false, upStopped = false, dnStopped = false
     
     for (var i = 1; i < explosionRange; i++) {
-        if (maxRanges[rt] == i - 1 && this.currentLevel.isBlockPassableAndNotBreakable(explosionOrigin.x + i, explosionOrigin.y)) {
+        if (maxRanges[rt] == i - 1 && this.currentLevel.isBlockPassableAndNotBreakable(explosionOrigin.x + i, explosionOrigin.y) && !rtStopped) {
             maxRanges[rt] += 1
             explosionCoords.push({"x": explosionOrigin.x + i, "y": explosionOrigin.y})
+
+            rtStopped = this.currentLevel.isBlockBreakable(explosionOrigin.x + i, explosionOrigin.y)
         }
 
-        if (maxRanges[up] == i - 1 && this.currentLevel.isBlockPassableAndNotBreakable(explosionOrigin.x, explosionOrigin.y - i)) {
+        if (maxRanges[up] == i - 1 && this.currentLevel.isBlockPassableAndNotBreakable(explosionOrigin.x, explosionOrigin.y - i) && !upStopped) {
             maxRanges[up] += 1
             explosionCoords.push({"x": explosionOrigin.x, "y": explosionOrigin.y - i})
+
+            upStopped = this.currentLevel.isBlockBreakable(explosionOrigin.x, explosionOrigin.y - i)
         }
         
-        if (maxRanges[lf] == i - 1 && this.currentLevel.isBlockPassableAndNotBreakable(explosionOrigin.x - i, explosionOrigin.y)) {
+        if (maxRanges[lf] == i - 1 && this.currentLevel.isBlockPassableAndNotBreakable(explosionOrigin.x - i, explosionOrigin.y) && !lfStopped) {
             maxRanges[lf] += 1
             explosionCoords.push({"x": explosionOrigin.x - i, "y": explosionOrigin.y})
+
+            lfStopped = this.currentLevel.isBlockBreakable(explosionOrigin.x - i, explosionOrigin.y)
         }
         
-        if (maxRanges[dn] == i - 1 && this.currentLevel.isBlockPassableAndNotBreakable(explosionOrigin.x, explosionOrigin.y + i)) {
+        if (maxRanges[dn] == i - 1 && this.currentLevel.isBlockPassableAndNotBreakable(explosionOrigin.x, explosionOrigin.y + i) && !dnStopped) {
             maxRanges[dn] += 1
             explosionCoords.push({"x": explosionOrigin.x, "y": explosionOrigin.y + i})
+
+            dnStopped = this.currentLevel.isBlockBreakable(explosionOrigin.x, explosionOrigin.y + i)
         }
     }
     
@@ -194,9 +204,11 @@ export default class extends Phaser.State {
   }
 
   adjustForCollisions(player, level) {
-    var hitPlatform = this.game.physics.arcade.collide(player, level.blocks);
+    var hitPlatform = this.game.physics.arcade.collide(player, level.blocks)
+    var hitBomb = this.game.physics.arcade.collide(player, level.bombs)
     var adjacentBlock = player.getFacingBlock()
 
+    // Check for obstacle collision
     if (hitPlatform && level.isBlockPassable(adjacentBlock.x, adjacentBlock.y)) {
       var delta = player.findDeltaFromPassing()
 
@@ -204,6 +216,24 @@ export default class extends Phaser.State {
 
       if (distance <= config.ALLOWED_DISTANCE) {
         player.adjustToCurrentBlock();
+      }
+    }
+
+    // Check for bomb collisions
+    if (hitBomb) {
+      for (var i in level.bombs.children) {
+        let bomb = level.bombs.children[i]
+
+        // Check collision between current player and individual bombs
+        if (bomb.checkBombCollision(player)) {
+          var delta = player.findDeltaFromPassing()
+
+          var distance = Math.sqrt(Math.pow(delta.x, 2) + Math.pow(delta.y, 2))
+
+          if (distance <= config.ALLOWED_DISTANCE) {
+            player.adjustToCurrentBlock();
+          }
+        }
       }
     }
   }

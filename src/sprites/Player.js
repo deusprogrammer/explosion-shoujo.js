@@ -97,9 +97,7 @@ export default class extends Phaser.Sprite {
       }
 
       this.bombsPlaced++
-
-    	var bombBlock = this.getFacingBlock()
-    	this.parentState.spawnBomb(this, bombBlock.x, bombBlock.y)
+    	this.parentState.spawnBomb(this, this.block.x, this.block.y)
     }
   }
 

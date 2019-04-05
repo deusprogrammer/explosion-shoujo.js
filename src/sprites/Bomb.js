@@ -2,6 +2,9 @@ import Phaser from 'phaser'
 
 import config from '../config'
 
+const SPAWNED = "SPAWNED"
+const SET = "SET"
+
 export default class Bomb extends Phaser.Sprite {
 	constructor({ game, x, y, fuse, radius, parentState, owner }) {
 		super(game, x, y, 'bomb')
@@ -22,10 +25,13 @@ export default class Bomb extends Phaser.Sprite {
     	this.x += Math.round(this.width * 0.5)
     	this.y += Math.round(this.height * 0.5)
 
+    	this.state = SPAWNED
+
     	game.physics.arcade.enable(this)
 	    this.body.setSize(config.BLOCK_SIZE - config.BB_ADJUST, config.BLOCK_SIZE - config.BB_ADJUST, config.BB_ADJUST/2, config.BB_ADJUST/2)
 	    this.body.collideWorldBounds = true
 	    this.body.immovable = true
+	    this.body.syncBounds = false
 	    this.body.checkCollision = {
 	    	up: true,
 	    	down: true,
@@ -44,6 +50,20 @@ export default class Bomb extends Phaser.Sprite {
 			this.parentState.spawnExplosion(this.owner, this.blockX, this.blockY, this.radius)
 			this.owner.bombsPlaced--
 			this.destroy()
+		}
+	}
+
+	checkBombCollision(player) {
+		var hitBomb = this.game.physics.arcade.collide(player, this, null, () => {
+			if (player === this.owner && this.state === SPAWNED) {
+				return false
+			}
+
+			return true
+		})
+
+		if (!hitBomb) {
+			this.state = SET
 		}
 	}
 

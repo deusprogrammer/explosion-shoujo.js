@@ -7,6 +7,7 @@ export default class Level {
 		this.enableBody = true;
 
 		this.blocks = game.add.group()
+		this.bombs = game.add.group()
 
 		this.breakableBlocks = {}
 
